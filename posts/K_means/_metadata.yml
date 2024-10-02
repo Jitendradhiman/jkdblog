@@ -12,9 +12,9 @@ author: "Jitendra K. Dhiman"
 # format:
 #   html:
 #     include-after-body: ../footer.html
-comments: true
-  # utterances:
-  #   repo: Jitendradhiman/jkdblog  # Replace with your actual repo
-  #   issue-term: title                   # Use post title for issues
-  #   label: "💬"                         # Optional label for issues
-  #   theme: "github-light"               # Choose a theme
+# comments: true
+utterances:
+  repo: Jitendradhiman/jkdblog  # Replace with your actual repo
+  issue-term: title                   # Use post title for issues
+  label: "💬"                         # Optional label for issues
+  theme: "github-light"               # Choose a theme
