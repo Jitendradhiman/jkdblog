@@ -9,7 +9,7 @@ website:
         href: archive.qmd
       - text: "About"
         href: about.qmd
-      - icon: assets/dark-theme.svg
+      - icon: github
         href: https://jitendradhiman.github.io/
       - icon: linkedin
         href: https://www.linkedin.com/in/jitendra-kumar-dhiman-phd-b02462a0/
