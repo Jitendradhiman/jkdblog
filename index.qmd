@@ -17,4 +17,5 @@ page-layout: full
 #     issue-term: title                   # Use post title for issues
 #     label: "💬"                         # Optional label for issues
 #     theme: "github-light"               # Choose a theme
+comments: false
 ---
