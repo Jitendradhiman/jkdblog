@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jitendra K. Dhiman">
+<meta name="dcterms.date" content="2024-09-25">
+
+<title>JKD Blog - Gumbel-Max Trick</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JKD Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../archive.html"> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://jitendradhiman.github.io/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/jitendra-kumar-dhiman-phd-b02462a0/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#inverse-cdf-method" id="toc-inverse-cdf-method" class="nav-link active" data-scroll-target="#inverse-cdf-method">Inverse CDF method</a></li>
+  <li><a href="#gumbel-max-trick" id="toc-gumbel-max-trick" class="nav-link" data-scroll-target="#gumbel-max-trick">Gumbel-max trick</a></li>
+  <li><a href="#application-to-deep-learning" id="toc-application-to-deep-learning" class="nav-link" data-scroll-target="#application-to-deep-learning">Application to deep learning</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Gumbel-Max Trick</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Jitendra K. Dhiman </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 25, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>Pre-requisite: Probability theory</p>
+</blockquote>
+<p>The Gumbel-max trick is useful technique for sampling from a discrete distribution, especially when built-in statistical functions are unavailable. Although many statistical software packages can handle a wide range of distributions, there are situations where you need to sample from distributions that may not be explicitly supported.</p>
+<p>In this blog, we will discuss the Gumbel-max trick, it’s mathematical proof, and a provide simulation example. Before diving into the trick, let’s do something easy first. We will briefly revist the inverse cumulative distribution function (CDF) method for smampling form a distribution, which applies to both continuous and discrete distributions. In contrast, the Gumbel-max trick is specifically applicable to the discrete distributions.</p>
+<section id="inverse-cdf-method" class="level3">
+<h3 class="anchored" data-anchor-id="inverse-cdf-method">Inverse CDF method</h3>
+<p><strong>Definition</strong>: The CDF of a random variable <span class="math inline">\(Z\)</span> is given by <span class="math inline">\(F_Z(z) = P(Z \leq z)~\forall~z\)</span> where <span class="math inline">\(P(\cdot)\)</span> denotes the probability. The CDF is a non-decreasing function defined on the real line <span class="math inline">\(\mathbb{R}\)</span>.<br> <strong>Definition</strong>: For a non-decreasing function <span class="math inline">\(F\)</span> on <span class="math inline">\(\mathbb{R}\)</span>, the generalized inverse is defined as <span class="math inline">\(F^{-1}(u) = min\{z: F(z) \geq u\}, u \in \mathbb{R}\)</span>. For a continuous random variable the inequality “<span class="math inline">\(\geq\)</span>” become equality “<span class="math inline">\(=\)</span>”.<br> Suppose that we want to sample <span class="math inline">\(Z \sim P(z)\)</span>, and we have access to inverse CDF of <span class="math inline">\(Z\)</span>, then<br> <strong>Lemma</strong>:<br> If <span class="math inline">\(U \sim \text{Uniform}(0, 1)\)</span>, then <span class="math inline">\(Z = F_Z^{-1}(U)\)</span> is a simulation from <span class="math inline">\(P(z)\)</span>.<br> <strong><em>Proof</em></strong>: Consider <span class="math inline">\(P(Z \leq z) = P(F_Z^{-1}(U) \leq z) = P(U \leq F_Z(z)) = \int_{0}^{F_Z(z)} 1~\text{d}u =  F_Z(z)\)</span>. Hence, <span class="math inline">\(Z\)</span> follows the desired distribution <span class="math inline">\(P(z)\)</span>. We can observe that the inverse CDF method can be used to generate samples of <span class="math inline">\(Z\)</span> through the transformation of a uniform random variable where the transformation is the inverse CDF of <span class="math inline">\(Z\)</span> itself. For most of the statistical softwares it is easier to generate samples from a uniform distribution.</p>
+<section id="a-coding-example" class="level4">
+<h4 class="anchored" data-anchor-id="a-coding-example">A Coding example</h4>
+<p>Suppose <span class="math inline">\(Z\)</span> is a categorical random variable that is <span class="math inline">\(Z\)</span> can take values from <span class="math inline">\(\{1, 2, \dots, K\}\)</span> with probabilities <span class="math inline">\(P(Z=k)=p_k\)</span> where <span class="math inline">\(K\)</span> denotes the categories. We would like to generate various realizations (samples) of <span class="math inline">\(Z\)</span> (e.g.&nbsp;<span class="math inline">\(\{Z_1, Z_2, \cdots, Z_n\}\)</span>) from this distribution. We can employ the inverse CDF method. Please refer to the Python code example for more clarity, come back, and read again.<br></p>
+</section>
+</section>
+<section id="gumbel-max-trick" class="level3">
+<h3 class="anchored" data-anchor-id="gumbel-max-trick">Gumbel-max trick</h3>
+<p><strong>Definition</strong>: The Gumbel distribution of a random variable <span class="math inline">\(X \in \mathbb{R}\)</span> is given by <span class="math inline">\(f_X(x) = \frac{1}{\beta}\exp(-(x - \mu) - \exp(-(x - \mu)/\beta))\)</span>, the CDF is <span class="math inline">\(F_X(x) = P(X \leq x) = \exp(-\exp(-(x - \mu)/\beta))\)</span>, and the inverse CDF is <span class="math inline">\(-\log(\log(x - \mu)/\beta)\)</span>. To the scope of this discussion, it is enough to consider <span class="math inline">\(\mu=0, \beta=1\)</span>, that is <span class="math inline">\(X \sim \text{Gumbel}(0, 1)\)</span>.<br> The Gumbel-max trick converts the sampling problem into an optimization problem and the key result is as follows.<br> <span class="math display">\[\begin{align}
+\tag{1}
+I = \underset{k}{\text{argmax}}~(\log(p_k) + G_k) \sim \text{Categorical}(p_k), 1 \leq k \leq K
+\end{align}\]</span> where <span class="math inline">\(G_k \sim \text{Gumbel}(0, 1)\)</span> are Gumbel-distributed i.i.d random variables, and <span class="math inline">\(I\in \mathbb{Z}\)</span> is a random variable because of <span class="math inline">\(G_k\)</span>. Eq. (1) states that the index <span class="math inline">\(I\)</span> follows the desired categorical distribution (see proof), this index is obtained by adding samples from the Gumbel distribution (the Gumbel noise) to the log probabilities and choosing the index for which the quantity is maximum. <br> <strong><em>Proof</em></strong>: Let <span class="math inline">\(X_k = \log(p_k) + G_k \in \mathbb{R}\)</span>. If the solution of Eq. (1) is the index <span class="math inline">\(k\)</span>, then the event <span class="math inline">\(\{I = k\}\)</span> is equivalent to the event <span class="math inline">\(\{X_k &gt; X_j~\forall j \neq k\}\)</span> in the probability space. We can further translate it to another equivalent event “<span class="math inline">\(\{\text{sum over all}~x~(X_k = x, X_j &lt; x~\forall j \neq k)\}\)</span>”. Please note that <span class="math inline">\(G_k\)</span>’s are i.i.d and consequently <span class="math inline">\(X_k\)</span>’s are also i.i.d. Hence in probability space, we have<br> <span class="math display">\[\begin{align}
+P(I = k) &amp;= P(X_k &gt; X_j~\forall k \neq j) = \int P(X_k = x, X_j &lt; x~\forall j \neq k)~\mathrm{d}x \\ \nonumber
+&amp;=\int P(X_k = x) P(X_j &lt; x~\forall~j \neq k|X_k = x)~\mathrm{d}x \\ \nonumber
+&amp;= \int P(X_k = x) P(X_j &lt; x~\forall~j \neq k)~\mathrm{d}x =  \int P(X_k = x) \prod_{j \neq k} P(X_j &lt; x)~\mathrm{d}x \\ \nonumber
+&amp;= \int P(G_k = x - log(p_k)) \prod_{j \neq k} P(G_j &lt; x - \log(p_j))~\mathrm{d}x \\ \nonumber
+&amp;= \int \exp(\log(p_k) - x - \exp(\log(p_k) - x)) \prod_{j \neq k} \exp(-\exp(\log(p_j) - x))~\mathrm{d}x \\ \nonumber
+&amp;= \int \exp(\log(p_k))\exp(-x)\exp(-\exp(\log(p_k) - x))\prod_{j \neq k} \exp(-\exp(\log(p_j) - x))~\mathrm{d}x \\ \nonumber
+&amp;= \int p_k \exp(-x)\prod_{k} \exp(-\exp(\log(p_k) - x))~\mathrm{d}x \\ \nonumber
+&amp;= \int p_k \exp(-x) \prod_{k} \exp(-p_k\exp(-x)))~\mathrm{d}x \\ \nonumber
+&amp;= p_k \int \exp(-x) \exp(-\sum_{k} p_k \exp(-x)))~\mathrm{d}x \\ \nonumber
+&amp;= p_k \int_{-\infty}^{+\infty} \exp(-x) \exp(-1\exp(-x)))~\mathrm{d}x = p_k
+\end{align}\]</span> This completes the proof. Hence the random variable <span class="math inline">\(I \sim \text{Cat}(p_k)\)</span>. To generate samples using this method, you only need to sample Gumbel-distributed variables <span class="math inline">\(G_k\)</span> and find the index that maximizes <span class="math inline">\(\log(p_k) + G_k\)</span>. In contrast to inverse CDF method, this avoids computing the CDF or performing a binary search. To sample Gumbel-distributed variables, you can start with a uniform random variable and transform it using the inverse Gumbel CDF <span class="math inline">\((-\log(-\log(-x)))\)</span> which is a closed-form expression, the resulting random variable will follow the Gumbel distribution. We can now generate various realizations of <span class="math inline">\(I\)</span>, i.e.&nbsp;<span class="math inline">\(\{I_1, I_2, \dots, I_n\}\)</span> by adding each time a different realization of Gumbel noise to the log-probabilities and picking up on the maximum index. Please refer to the Python code.<br></p>
+</section>
+<section id="application-to-deep-learning" class="level3">
+<h3 class="anchored" data-anchor-id="application-to-deep-learning">Application to deep learning</h3>
+<p>The Gumbel-max trick finds significant application in deep learning, particularly in sampling from categorical distributions during optimization. Below are two common issues in deep learning that the trick helps address.</p>
+<ul>
+<li><h4 id="issue-1" class="anchored">Issue-1</h4>
+Optimizing categorical probabilities <span class="math inline">\(p_k\)</span> often requires solving a constrained problem where <span class="math inline">\(\sum_k p_k = 1\)</span> which is hard to optimize using gradient descent. To overcome, one simple is to reparameterize <span class="math inline">\(p_k\)</span> using another variable <span class="math inline">\(\theta_k \in \mathbb{R}\)</span> through softmax.</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+p_k = \frac{\exp(\theta_k)}{\sum_j \exp(\theta_j)}~\mathrm{where}~\theta_k \in \mathbb{R}.
+\end{align}\]</span></p>
+<p><span class="math inline">\(\theta_k\)</span> could be the logits from a neural network. This formulation allows for unconstrained optimization since the logits can take any real value. However, in some scenarios, normalization can be either computationally expensive or may not be possible. You can think of a streaming automatic speech recognition system, where not all the logits are available. Gumbel-Max trick can overcome this. Following the proof along the similar lines as above, it can be shown that <span class="math inline">\(\underset{k}{\text{argmax}}\{\theta_k + G_k\} \sim \text{Cat}(p_k)\)</span> (You can do it as an exercise). This result remains valid for each <span class="math inline">\(\theta_k\)</span>’s.</p>
+<ul>
+<li><h4 id="issue-2" class="anchored">Issue-2</h4>
+Neural networks typically rely on gradient-based optimization, which requires all operations to be differentiable. Both the inverse CDF method and the Gumbel-max trick involve non-differentiable operations.<br>
+<ul>
+<li>The inverse CDF method introduces discontinuities when selecting categories based on cumulative probabilities.<br></li>
+<li>The Gumbel-max trick involves the <span class="math inline">\(\text{argmax}\)</span> operation, which is non-differentiable.</li>
+</ul></li>
+</ul>
+<p>While many researchers have proposed relaxation for the differentiability of both methods, the Softmax variant of the Gumbel-max trick “Gumbel-softmax trick” is often used. It replaces the <span class="math inline">\(\text{argmax}\)</span> with a differentiable approximation (softmax) that allows gradients to flow through the sampling process, making it suitable for backpropagation during neural network training. We leave this for future discussion (reference: <a href="https://arxiv.org/pdf/1611.01144" style="text-decoration: none; color: blue;" target="_blank">Gumbel-Softmax</a>).</p>
+<div id="cell-3" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> time <span class="im">import</span> time</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inverse CDF Method</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> inverse_cdf(prob):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> np.random.uniform()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    cdf_of_z <span class="op">=</span> np.cumsum(prob)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># using generalized inverse, we need to find the minimum index j such that F(j) &gt;= u for all u, for this we use numpy function "searchsorted"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    sample <span class="op">=</span> np.searchsorted(cdf_of_z, u) <span class="co"># this yields the samples of Z</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sample</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Gumbel-max trick</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gumbel_max(prob):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    log_p <span class="op">=</span> np.log(prob)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> np.random.uniform(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="bu">len</span>(log_p))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    G <span class="op">=</span> <span class="op">-</span>np.log(<span class="op">-</span>np.log(u)) <span class="co"># use inverse Gumbel CDF to sample from Gumbel distribution given the uniform random variables</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> np.argmax(prob <span class="op">+</span> G)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> I</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> est_prob(samples, n_samples):</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.bincount(samples) <span class="op">/</span> n_samples</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>prob <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.4</span>] <span class="co"># the pk's for K = 4</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="dv">5000</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>start_g <span class="op">=</span> time()</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>samples_gumbel <span class="op">=</span> [gumbel_max(prob) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_samples)] <span class="co"># generate samples using Gumbel</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>end_g <span class="op">=</span> time() <span class="op">-</span> start_g</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--"</span><span class="op">*</span><span class="dv">20</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Time taken by Gumbel-max: </span><span class="sc">{</span>end_g<span class="sc">:0.4f}</span><span class="ss"> Sec"</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>start_cdf <span class="op">=</span> time()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>samples_invcdf <span class="op">=</span> [inverse_cdf(prob) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_samples)] <span class="co"># generate samples using inverse CDF </span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Time taken by inverse CDF: </span><span class="sc">{</span>time() <span class="op">-</span> start_cdf<span class="sc">:0.4f}</span><span class="ss"> Sec"</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># we can compute the estimated probabilites from the samples of Z</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>est_prob_gumbel <span class="op">=</span> est_prob(samples_gumbel, n_samples)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>est_prob_invcdf <span class="op">=</span>  est_prob(samples_invcdf, n_samples) <span class="co"># more number of samples (n_samples) will give better estimates</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>error_gumbel <span class="op">=</span> <span class="bu">abs</span>(prob <span class="op">-</span> est_prob_gumbel)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>error_invcdf <span class="op">=</span> <span class="bu">abs</span>(prob <span class="op">-</span> est_prob_invcdf)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>bar_width <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> np.arange(<span class="bu">len</span>(prob)) <span class="co"># number of categories</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].bar(K <span class="op">-</span> bar_width, prob, bar_width, label<span class="op">=</span><span class="st">"ORG. PROB."</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].bar(K, est_prob_invcdf, bar_width, color<span class="op">=</span><span class="st">'brown'</span>, label<span class="op">=</span><span class="st">"EST. PROB. (Inv CDF)"</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].bar(K <span class="op">+</span> bar_width, est_prob_gumbel, bar_width, color<span class="op">=</span><span class="st">'green'</span>, label<span class="op">=</span><span class="st">"EST. PROB. (Gumbel)"</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_ylim([<span class="dv">0</span>, <span class="dv">1</span>])</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_ylabel(<span class="st">"PROBABILITIES"</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].bar(K, error_invcdf , bar_width, color<span class="op">=</span><span class="st">'brown'</span>, label<span class="op">=</span><span class="st">"ERROR (Inv CDF)"</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].bar(K <span class="op">+</span> bar_width, error_gumbel, bar_width, color<span class="op">=</span><span class="st">'green'</span>, label<span class="op">=</span><span class="st">"ERROR (Gumbel)"</span>)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlabel(<span class="st">"CATEGORIES"</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylabel(<span class="st">"ERROR"</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].legend()</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].legend()</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Avg. error Gumbel-max: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(error_gumbel)<span class="op">/</span><span class="bu">len</span>(prob)<span class="sc">:0.4f}</span><span class="ss">"</span>)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Avg. error inv CDF: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(error_invcdf)<span class="op">/</span><span class="bu">len</span>(prob)<span class="sc">:0.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>----------------------------------------
+Time taken by Gumbel-max: 0.4369 Sec
+Time taken by inverse CDF: 0.3250 Sec
+Avg. error Gumbel-max: 0.0753
+Avg. error inv CDF: 0.0050</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="gumbel_max_files/figure-html/cell-2-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

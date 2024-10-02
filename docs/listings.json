@@ -1,0 +1,16 @@
+[
+  {
+    "listing": "/archive.html",
+    "items": [
+      "/posts/gumbel_max/gumbel_max.html",
+      "/posts/K_means/K-means.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/posts/gumbel_max/gumbel_max.html",
+      "/posts/K_means/K-means.html"
+    ]
+  }
+]
