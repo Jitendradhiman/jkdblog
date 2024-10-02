@@ -11,4 +11,10 @@ listing:
 page-layout: full
 # title-block-banner: false
 # title-block-style: none
+comments:
+  utterances:
+    repo: Jitendradhiman/jkdblog  # Replace with your actual repo
+    issue-term: title                   # Use post title for issues
+    label: "💬"                         # Optional label for issues
+    theme: "github-light"               # Choose a theme
 ---
