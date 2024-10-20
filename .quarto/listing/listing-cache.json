@@ -1,0 +1,10 @@
+{
+  "listingMap": {
+    "archive.qmd": [
+      "posts/**/*.ipynb"
+    ],
+    "index.qmd": [
+      "posts/**/*.ipynb"
+    ]
+  }
+}

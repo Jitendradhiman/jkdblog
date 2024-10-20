@@ -1,0 +1,17 @@
+{
+  "posts/K_means/K-means.ipynb": {
+    "K-means.html": "597d2aa8"
+  },
+  "posts/gumbel_max/gumbel_max.ipynb": {
+    "gumbel_max.html": "69dc3e1c"
+  },
+  "archive.qmd": {
+    "archive.html": "7407e20f"
+  },
+  "index.qmd": {
+    "index.html": "b6afd42a"
+  },
+  "about.qmd": {
+    "about.html": "aeec1274"
+  }
+}
