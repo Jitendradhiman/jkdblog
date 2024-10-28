@@ -13,5 +13,8 @@
   },
   "about.qmd": {
     "about.html": "aeec1274"
+  },
+  "posts/vae/vae-v3.ipynb": {
+    "vae-v3.html": "67ee4d23"
   }
 }
