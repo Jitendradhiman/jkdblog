@@ -11,4 +11,5 @@ listing:
 page-layout: full
 # title-block-banner: false
 # title-block-style: none
+comments: false
 ---

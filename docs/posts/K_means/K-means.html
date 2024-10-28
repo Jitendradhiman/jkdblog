@@ -234,7 +234,7 @@ window.Quarto = {
 </header>
 
 
-<p>The K-means algorithm is an unsupervised learning algorithm that partitions a dataset into k clusters. It works by iteratively assigning data points to clusters and then updating the cluster centroids. A cluster centroid is a representative vector of the cluster in statistical sense.</p>
+<p>The K-means algorithm is an unsupervised learning algorithm that partitions a dataset into k clusters. It works by iteratively assigning data points to clusters and then updating the cluster centroids. A cluster centroid is a representative vector of the cluster in the statistical sense.</p>
 <p><strong>Task:</strong> To begin with, we are given a set of data points <span class="math inline">\(\{x_n\}_{n=1}^N\)</span>, <span class="math inline">\(x_n \in \mathbb{R}^d\)</span>. Our task is to group them into the given number of clusters <span class="math inline">\(K\)</span>.</p>
 <p><strong>Steps:</strong> 1. <strong>Initialize the cluster centroids:</strong><br>
 <span class="math inline">\(\quad\)</span> <span class="math inline">\(\bullet\)</span> Randomly select <span class="math inline">\(K\)</span> data points as the initial cluster centroids.<br>
@@ -244,34 +244,40 @@ window.Quarto = {
 3. <strong>Update the cluster centroids:</strong><br>
 <span class="math inline">\(\quad\)</span> <span class="math inline">\(\bullet\)</span> For each cluster, calculate the mean of all data points assigned to it in the previous step.<br>
 <span class="math inline">\(\quad\)</span> <span class="math inline">\(\bullet\)</span> Set the cluster centroid to the calculated mean.<br>
-4. <strong>Repeat steps 2 and 3 untill convergence</strong>:<br>
+4. <strong>Repeat steps 2 and 3 until convergence</strong>:<br>
 <span class="math inline">\(\quad\)</span> <span class="math inline">\(\bullet\)</span> Convergence is reached when the cluster centroids no longer change or when a maximum number of iterations is reached.</p>
 <section id="maths-behind-it" class="level2">
 <h2 class="anchored" data-anchor-id="maths-behind-it">Maths Behind it</h2>
-<p>Lets translate these steps into the maths behind it.<br>
-<strong>Notataions:</strong><br>
+<p>Let’s translate these steps into the maths behind it.<br>
+<strong>Notations:</strong><br>
 <span class="math inline">\(\quad\)</span> <span class="math inline">\(\bullet\)</span> Let <span class="math inline">\(C_k\)</span> denotes the label of the <span class="math inline">\(k^{th}\)</span> cluster, <span class="math inline">\(k \in \{1, 2, \dots, K\}\)</span><br>
 <span class="math inline">\(\quad\)</span> <span class="math inline">\(\bullet\)</span> Consider a binary variable <span class="math display">\[r_{nk} = \begin{cases} 1, &amp; \text{if } x_n \text{ is assigned to cluster } C_k, \\ 0, &amp; \text{ otherwise.} \end{cases}\]</span></p>
-<p>The optimization problem for K-means clustering is defined as follows. <!-- <center> --> <span class="math display">\[\begin{align}
+<p>The optimization problem for K-means clustering is defined as follows.</p>
+<p><span class="math display">\[\begin{align}
 \underset{r_{nk}, \mu_k}{\text{arg min}} \sum_{k=1}^K \sum_{n=1}^{N} r_{nk}\| x_n - \mu_k \|_{2}^2 \tag{1}
-\end{align}\]</span> <!-- </center> --> where <span class="math inline">\(\mu_k\)</span> denotes the statistical mean of the data points belonging to the <span class="math inline">\(k^{th}\)</span> cluster also referred to as the cluster centroid. This problem is solved in two phases for the unknowns <span class="math inline">\(r_{nk}\)</span> and <span class="math inline">\(\mu_k\)</span>.</p>
+\end{align}\]</span></p>
+<p>where <span class="math inline">\(\mu_k\)</span> denotes the statistical mean of the data points belonging to the <span class="math inline">\(k^{th}\)</span> cluster also referred to as the cluster centroid. This problem is solved in two phases for the unknowns <span class="math inline">\(r_{nk}\)</span> and <span class="math inline">\(\mu_k\)</span>.</p>
 <p><em>Phase 1:</em></p>
-<p>Fix <span class="math inline">\(\mu_k\)</span>’s for all <span class="math inline">\(k\)</span> and determine <span class="math inline">\(r_{nk}\)</span> for each <span class="math inline">\(n\)</span> as folllows. <span class="math display">\[r_{nk^*} = \begin{cases} 1, &amp; k^* = \underset{j}{\text{arg min }} \|x_n - \mu_j\|^2, j = 1, 2, \dots, K \\ 0, &amp; \text{ otherwise.} \end{cases}\]</span> This phase translate to Step 2 above in the theory part that is the values of <span class="math inline">\(r_{nk}\)</span> represnting the cluster assignment are obtained by computing the minimum distance of each of the data points to the cluster centroids (the centroids <span class="math inline">\(\mu_k\)</span>’s are initialized to randomly chosen data points).</p>
+<p>Fix <span class="math inline">\(\mu_k\)</span>’s for all <span class="math inline">\(k\)</span> and determine <span class="math inline">\(r_{nk}\)</span> for each <span class="math inline">\(n\)</span> as follows. <span class="math display">\[\begin{align}
+r_{nk^*} = \begin{cases} 1, &amp; k^* = \underset{j}{\text{arg min }} \|x_n - \mu_j\|^2, j = 1, 2, \dots, K \\ 0, &amp; \text{ otherwise.} \end{cases}
+\end{align}\]</span> This phase translates to Step 2 above in the theory part that is the values of <span class="math inline">\(r_{nk}\)</span> representing the cluster assignment are obtained by computing the minimum distance of each of the data points to the cluster centroids (the centroids <span class="math inline">\(\mu_k\)</span>’s are initialized to randomly chosen data points).</p>
 <p><em>Phase 2:</em></p>
 <p>Fix <span class="math inline">\(r_{nk}\)</span>’s obtained in Phase 1 and optimize for <span class="math inline">\(\mu_k\)</span>. This requires taking the derivative of Eq. (1) with respect to <span class="math inline">\(\mu_j\)</span> and equating it to zero which gives</p>
-<p><span class="math display">\[\mu_j^* = \frac{\sum_n r_{nj}x_n}{\sum_n r_{nj}},~ j=1,2,\dots, K.\]</span></p>
-<p>This translates to Step 3 above. We just compute the mean of the data points which were closest to a particular centroid. This mean value <span class="math inline">\(\mu_j^*\)</span> represents the updated cluster centroid. Step 4 from previous section translates to repeating the Phase 1 and Phase 2 until convergence. The full algorithm is described as follows.</p>
+<p><span class="math display">\[\begin{align}
+\mu_j^* = \frac{\sum_n r_{nj}x_n}{\sum_n r_{nj}},~ j=1,2,\dots, K.
+\end{align}\]</span></p>
+<p>This translates to Step 3 above. We just computed the mean of the data points which were closest to a particular centroid. This mean value <span class="math inline">\(\mu_j^*\)</span> represents the updated cluster centroid. Step 4 from the previous section translates to repeating Phase 1 and Phase 2 until convergence. The full algorithm is described as follows.</p>
 <section id="algorithm" class="level3">
 <h3 class="anchored" data-anchor-id="algorithm"><strong>Algorithm:</strong></h3>
 <ol type="1">
 <li>Initialize <span class="math inline">\(\mu_k\)</span>’s for each value <span class="math inline">\(k\)</span> by randomly choosing <span class="math inline">\(K\)</span> data points.</li>
 <li>Calculate <span class="math inline">\(r_{nk}\)</span>’s holding <span class="math inline">\(\mu_k\)</span>’s fixed</li>
 <li>Calculate <span class="math inline">\(\mu_k\)</span>’s holding <span class="math inline">\(r_{nk}\)</span>’s fixed</li>
-<li>Repeat 2 and 3 untill convergence that is <span class="math display">\[\|\mu_k^{(t+1)} - \mu_k^{(t)}\| \approx 0~\forall k\]</span> where <span class="math inline">\(t\)</span> denotes the iteration number.</li>
+<li>Repeat 2 and 3 until convergence that is <span class="math inline">\(\|\mu_k^{(t+1)} - \mu_k^{(t)}\| \approx 0~\forall k\)</span> where <span class="math inline">\(t\)</span> denotes the iteration number.</li>
+<li>Output: <span class="math inline">\(\{\mu_k^*\}_{k=1}^K\)</span> and <span class="math inline">\(\{r_{nk}^*\}_{k=1}^K\)</span>.</li>
 </ol>
-<p>Output: <span class="math inline">\(\{\mu_k^*\}_{k=1}^K\)</span> and <span class="math inline">\(\{r_{nk}^*\}_{k=1}^K\)</span>.</p>
-<p>It should be noted that the algorithm requires a prior knowledge of <span class="math inline">\(K\)</span>. In practice, this is unknown for a given dataset. There are several methods proposed in the literature to get an estimate of the number of clusters from a given dataset (Please refer or ask ChatGPT 😊!).</p>
-<p>That’s all for this algorithm 😊! Next section provides a python code for it.</p>
+<p>It should be noted that the algorithm requires prior knowledge of <span class="math inline">\(K\)</span>. In practice, this is unknown for a given dataset. There are several methods proposed in the literature to get an estimate of the number of clusters from a given dataset (Please refer or ask ChatGPT 😊!).</p>
+<p>That’s all for this algorithm 😊! The next section provides a Python code for it.</p>
 </section>
 </section>
 <section id="python-code-for-k-means-algorithm" class="level2">

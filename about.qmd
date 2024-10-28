@@ -13,7 +13,7 @@ links:
   - icon: github
     text: Github
     href: https://jitendradhiman.github.io/
-
+comments: false
 ---
 
 <!-- <div style="text-align: left"> **Hi, I am Dr. Jitendra Kumar Dhiman**. </div> -->
