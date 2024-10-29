@@ -220,6 +220,7 @@ window.Quarto = {
   <li><a href="#vae-encoder" id="toc-vae-encoder" class="nav-link" data-scroll-target="#vae-encoder">VAE encoder</a></li>
   <li><a href="#prior" id="toc-prior" class="nav-link" data-scroll-target="#prior">Prior</a></li>
   <li><a href="#vae-decoder" id="toc-vae-decoder" class="nav-link" data-scroll-target="#vae-decoder">VAE decoder</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   <li><a href="#vae-training-and-the-reparametrization-trick" id="toc-vae-training-and-the-reparametrization-trick" class="nav-link" data-scroll-target="#vae-training-and-the-reparametrization-trick">VAE training and the reparametrization trick</a></li>
   <li><a href="#the-coding-example-and-key-focus-areas" id="toc-the-coding-example-and-key-focus-areas" class="nav-link" data-scroll-target="#the-coding-example-and-key-focus-areas">The Coding Example and Key Focus Areas</a></li>
   </ul>
@@ -286,8 +287,17 @@ p_{\theta}(x|z) = \prod_{d=1}^{D}\prod_{l=1}^{L-1} p_{dl}^{I_{\{x_d = l\}}}
 <h4 class="anchored" data-anchor-id="formulation-2">Formulation-2</h4>
 <p>In formulation-1, we derived the reconstruction error <span class="math inline">\(p_{\theta}(x|z)\)</span> for the discrete case <strong>i.e.</strong> <span class="math inline">\(x_d \in \mathbb{Z}^D\)</span>. In this formulation, we seek the treatment for the continuous case <strong>i.e.</strong> <span class="math inline">\(x_d \in \mathbb{R}^D\)</span>. Further, we assume that <span class="math inline">\(x_d\)</span> is normalized <strong>i.e.</strong> <span class="math inline">\(x_d \in [0, 1]\)</span>. An appropriate choice is the binary-cross entropy with soft labels given by <span class="math inline">\(x_d\)</span>. <span class="math display">\[\begin{align*}
 \ln p_{\theta}(x|z) = - \sum_{d=1}^{D} x_d \ln \hat p_d(z)
-\end{align*}\]</span> where <span class="math inline">\(\hat p_d(z) \in \mathbb{R}^{L-1}\)</span> are given by the decoder that is <span class="math inline">\(\hat p_d(z) = \mathrm{sigmoid}(f_{\theta}(z))\)</span>. We use <span class="math inline">\(\mathrm{sigmoid}(\cdot)\)</span> to squash each pixel value between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>. ### Summary - <span class="math inline">\(ELBO = E_q \ln p(z) + E_q \ln p_{\theta}(x|z) - E_q \ln q_{\phi}(z|x)\)</span> - <span class="math inline">\(p(z) \sim \mathcal{N}(z|0, I)\)</span> - <span class="math inline">\(p_{\theta}(x|z)\)</span> is the reconstruction error and depends on <span class="math inline">\(x\)</span> - <span class="math inline">\(q_{\phi}(z|x) \sim \mathcal{N}(z|\mu_{\phi}(x), \sigma^2_{\phi}(x)I)\)</span> is known as the variational posterior</p>
+\end{align*}\]</span> where <span class="math inline">\(\hat p_d(z) \in \mathbb{R}^{L-1}\)</span> are given by the decoder that is <span class="math inline">\(\hat p_d(z) = \mathrm{sigmoid}(f_{\theta}(z))\)</span>. We use <span class="math inline">\(\mathrm{sigmoid}(\cdot)\)</span> to squash each pixel value between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>.<br></p>
 </section>
+</section>
+<section id="summary" class="level3">
+<h3 class="anchored" data-anchor-id="summary">Summary</h3>
+<ul>
+<li><span class="math inline">\(ELBO = E_q \ln p(z) + E_q \ln p_{\theta}(x|z) - E_q \ln q_{\phi}(z|x)\)</span></li>
+<li><span class="math inline">\(p(z) \sim \mathcal{N}(z|0, I)\)</span></li>
+<li><span class="math inline">\(p_{\theta}(x|z)\)</span> is the reconstruction error and depends on <span class="math inline">\(x\)</span></li>
+<li><span class="math inline">\(q_{\phi}(z|x) \sim \mathcal{N}(z|\mu_{\phi}(x), \sigma^2_{\phi}(x)I)\)</span> is known as the variational posterior</li>
+</ul>
 </section>
 <section id="vae-training-and-the-reparametrization-trick" class="level2">
 <h2 class="anchored" data-anchor-id="vae-training-and-the-reparametrization-trick">VAE training and the reparametrization trick</h2>
