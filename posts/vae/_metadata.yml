@@ -3,8 +3,13 @@
 # freeze computational output
 # (see https://quarto.org/docs/projects/code-execution.html#freeze)
 freeze: true
-
 # Enable banner style title blocks
 title-block-banner: true
 date: "Oct 28, 2024"
 author: "Jitendra K Dhiman"
+comments:
+  utterances:
+    repo: Jitendradhiman/jkdblog  # Replace with your actual repo
+    issue-term: title                   # Use post title for issues
+    label: "💬"                         # Optional label for issues
+    theme: "github-light"               # Choose a theme
