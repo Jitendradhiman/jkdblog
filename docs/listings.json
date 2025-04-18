@@ -2,7 +2,6 @@
   {
     "listing": "/archive.html",
     "items": [
-      "/posts/vae/vae-v3.html",
       "/posts/gumbel_max/gumbel_max.html",
       "/posts/K_means/K-means.html"
     ]
@@ -10,7 +9,6 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/vae/vae-v3.html",
       "/posts/gumbel_max/gumbel_max.html",
       "/posts/K_means/K-means.html"
     ]

@@ -236,6 +236,9 @@ window.Quarto = {
 <p>Pre-requisite: Probability theory</p>
 </blockquote>
 <p>The Gumbel-max trick is a useful technique for sampling from a discrete distribution, especially when built-in statistical functions are unavailable. Although many statistical software packages can handle a wide range of distributions, there are situations where you need to sample from distributions that may not be explicitly supported.</p>
+<blockquote class="blockquote">
+<p>Further, the Gumbel-Softmax trick (a varient of Gumbel-max trick) enables differentiable sampling from a categorical distribution by adding Gumbel noise to the logits and applying the softmax function, making it possible to train models with discrete variables using gradient-based methods.</p>
+</blockquote>
 <p>In this blog, we will discuss the Gumbel-max trick, its mathematical proof, and a simulation example. Before diving into the trick, let’s do something easy first. We will briefly review the inverse cumulative distribution function (CDF) method for sampling from a distribution, which applies to both continuous and discrete distributions. In contrast, the Gumbel-max trick is specifically applicable to the discrete distributions.</p>
 <section id="inverse-cdf-method" class="level3">
 <h3 class="anchored" data-anchor-id="inverse-cdf-method">Inverse CDF method</h3>
@@ -255,7 +258,7 @@ P(I = k) &amp;= P(X_k &gt; X_j~\forall k \neq j) = \int P(X_k = x, X_j &lt; x~\f
 &amp;=\int P(X_k = x) P(X_j &lt; x~\forall~j \neq k|X_k = x)~\mathrm{d}x \\ \nonumber
 &amp;= \int P(X_k = x) P(X_j &lt; x~\forall~j \neq k)~\mathrm{d}x =  \int P(X_k = x) \prod_{j \neq k} P(X_j &lt; x)~\mathrm{d}x \\ \nonumber
 &amp;= \int P(G_k = x - log(p_k)) \prod_{j \neq k} P(G_j &lt; x - \log(p_j))~\mathrm{d}x \\ \nonumber
-&amp;= \int \exp(\log(p_k) - x - \exp(\log(p_k) - x)) \prod_{j \neq k} \exp(-\exp(\log(p_j) - x))~\mathrm{d}x \\ \nonumber
+&amp;= \int \exp(\log(p_k) - x - \exp(\log(p_k) - x)) \prod_{j \neq k} \exp(-\exp(\log(p_j) - x))~\mathrm{d}x ~(\text{using pdf and cdf of } G_k) \\ \nonumber
 &amp;= \int \exp(\log(p_k))\exp(-x)\exp(-\exp(\log(p_k) - x))\prod_{j \neq k} \exp(-\exp(\log(p_j) - x))~\mathrm{d}x \\ \nonumber
 &amp;= \int p_k \exp(-x)\prod_{k} \exp(-\exp(\log(p_k) - x))~\mathrm{d}x \\ \nonumber
 &amp;= \int p_k \exp(-x) \prod_{k} \exp(-p_k\exp(-x)))~\mathrm{d}x \\ \nonumber
@@ -268,7 +271,7 @@ P(I = k) &amp;= P(X_k &gt; X_j~\forall k \neq j) = \int P(X_k = x, X_j &lt; x~\f
 <p>The Gumbel-max trick finds significant application in deep learning, particularly in sampling from categorical distributions during optimization. Below are two common issues in deep learning that the trick helps address.</p>
 <ul>
 <li><h4 id="issue-1" class="anchored">Issue-1</h4>
-Optimizing categorical probabilities <span class="math inline">\(p_k\)</span> often requires solving a constrained problem where <span class="math inline">\(\sum_k p_k = 1\)</span> which is hard to optimize using gradient descent. To overcome this, one simple is to reparameterize <span class="math inline">\(p_k\)</span> using another variable <span class="math inline">\(\theta_k \in \mathbb{R}\)</span> through softmax.</li>
+Optimizing categorical probabilities <span class="math inline">\(p_k\)</span> often requires solving a constrained problem where <span class="math inline">\(\sum_k p_k = 1\)</span> which is hard to optimize using gradient descent. To overcome this, one simple trick is to reparameterize <span class="math inline">\(p_k\)</span> using another variable <span class="math inline">\(\theta_k \in \mathbb{R}\)</span> through softmax.</li>
 </ul>
 <p><span class="math display">\[\begin{align}
 p_k = \frac{\exp(\theta_k)}{\sum_j \exp(\theta_j)}~\mathrm{where}~\theta_k \in \mathbb{R}.
