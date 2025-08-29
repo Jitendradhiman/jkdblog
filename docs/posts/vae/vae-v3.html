@@ -290,7 +290,7 @@ p_{\theta}(x|z) = \prod_{d=1}^{D}\prod_{l=0}^{L-1} p_{dl}^{I_{\{x_d = l\}}}
 <section id="formulation-2" class="level4">
 <h4 class="anchored" data-anchor-id="formulation-2">Formulation-2</h4>
 <p>In formulation-1, we derived the reconstruction error <span class="math inline">\(p_{\theta}(x|z)\)</span> for the discrete case <strong>i.e.</strong> <span class="math inline">\(x \in \mathbb{Z}^D\)</span>. In this formulation, we seek the treatment for the continuous case <strong>i.e.</strong> <span class="math inline">\(x \in \mathbb{R}^D\)</span>. Further, we assume that <span class="math inline">\(x_d\)</span> is normalized <strong>i.e.</strong> <span class="math inline">\(x_d \in [0, 1]\)</span>. Hence, <span class="math inline">\(x \in (0, 1)^D\)</span>. An appropriate choice is the binary-cross entropy with soft labels given by <span class="math inline">\(x_d\)</span> (in contrast to hard labels represented by on-hot vectors). <span class="math display">\[\begin{align*}
-\ln p_{\theta}(x|z) = - \sum_{d=1}^{D}\bigg(x_d \ln \hat p_d(z) + (1- x_d) (1 - \ln \hat p_d(z))\bigg)
+\ln p_{\theta}(x|z) = - \sum_{d=1}^{D}\bigg(x_d \ln \hat p_d(z) + (1- x_d) \ln (1 -  \hat p_d(z))\bigg)
 \end{align*}\]</span> where <span class="math inline">\(\hat p_d(z)\)</span> are given by the decoder that is <span class="math inline">\(\hat p_d(z) = \mathrm{sigmoid}(f_{\theta}(z))\)</span>. We use <span class="math inline">\(\mathrm{sigmoid}(\cdot)\)</span> to squash each pixel value between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>.<br></p>
 </section>
 </section>
